@@ -10,16 +10,42 @@ namespace Calc
     {
         static void Main(string[] args)
         {           
-            int CountMathIterations = 0;
-
             Console.WriteLine("Введите пример для решения.");
             string Example = Console.ReadLine();
-
-            CountMathIterations = GetCountMathIterations(Example);
-            Example = StringToNumber(CountMathIterations, Example);
-           
+            Example = GetNumberFromBrackets(Example);          
+            Example = StringToNumber(GetCountMathIterations(Example), Example);          
             Console.WriteLine($"Ответ: {Example}");
             Console.ReadKey();
+        }  
+        static string GetNumberFromBrackets (string example)
+        {
+          int startIndex = 0;
+          int endIndex = 0;
+          string exampleInBrackets = null;
+          string endString = null;
+            while (example.Contains('(') || example.Contains(')'))
+            {
+                for (int i = 0; i < example.Length; i++)
+                {
+                    if (example[i] == '(')
+                        startIndex = i;
+                    if (example[i] == ')')
+                    {
+                        endIndex = i;
+                        for (int j = startIndex + 1; j < endIndex; j++)
+                            exampleInBrackets += example[j];
+                        for (int j = 0; j < startIndex - 1; j++)
+                            endString += example[j];
+                        endString += StringToNumber(GetCountMathIterations(exampleInBrackets), exampleInBrackets);
+                        for (int j = endIndex + 1; j < example.Length; j++)
+                            endString += example[j];
+                        break;
+                    }
+                }              
+                example = endString; 
+                endString = string.Empty;
+            }
+            return example;
         }
 
         static float Calculate (char operation, string number1, string number2)
@@ -49,7 +75,7 @@ namespace Calc
             while (CountMathIterations > 0)
             {
                 bool CanDoPlusMinus = false;
-                string[] Cache = Example.Split(' ');
+                string[] Cache = GetSplited(Example);
                 for (int i = -1; i <= Cache.Length - 1;)
 
                 {
@@ -102,7 +128,24 @@ namespace Calc
             return Example;
         }
 
-        
-
+        static string [] GetSplited (string example)
+        {
+            string [] Cache = new string[example.Length];
+            int index = 0;
+         for (int i = 0; i < example.Length;i++)
+            {
+                if (example[i] == '/' || example[i] == '*' || example[i] == '+' || example[i] == '-')
+                {
+                    index++;
+                    Cache[index] += example[i];
+                    index++;
+                }
+                else
+                {
+                    Cache[index] += example[i];
+                }
+            }
+         return Cache;
+        }
     }
 }
