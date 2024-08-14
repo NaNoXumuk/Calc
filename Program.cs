@@ -37,7 +37,20 @@ namespace Calc
                         for (int j = 0; j < startIndex-1; j++)
                             endString += example[j];
                         if (Convert.ToSingle(StringToNumber(GetCountMathIterations(exampleInBrackets), exampleInBrackets)) < 0)
-                        endString += StringToNumber(GetCountMathIterations(exampleInBrackets), exampleInBrackets);
+                            switch (example[startIndex - 1])
+                            {
+                                case '+':
+                                    endString += StringToNumber(GetCountMathIterations(exampleInBrackets), exampleInBrackets);
+                                    break;
+                                case '-':                                    
+                                    endString += "+" + Convert.ToSingle(StringToNumber(GetCountMathIterations(exampleInBrackets), exampleInBrackets)) * -1;
+                                    break;
+                                case '/':
+                                case '*':
+                                    endString += example[startIndex - 1] + StringToNumber(GetCountMathIterations(exampleInBrackets), exampleInBrackets);
+                                    break;
+
+                            }
                         else
                         {
                             endString += example[startIndex - 1];
@@ -72,9 +85,17 @@ namespace Calc
         static int GetCountMathIterations (string Example)
         {
             int count = 0;
-            for (int i = 0; i < Example.Length; i++)
+            if (Example[0] == '-')
+                count--;
+            for (int i = 0; i < Example.Length; i++)               
                 if (Example[i] == '/' || Example[i] == '*' || Example[i] == '+' || Example[i] == '-')
+                    if (Example[i+1] != '-')
                     count++;
+            else
+                    {
+                        count++;
+                        i++;
+                    }
             return count;
         }
 
@@ -141,18 +162,31 @@ namespace Calc
         {
             string [] Cache = new string[example.Length];
             int index = 0;
-         for (int i = 0; i < example.Length;i++)
+            int i = 0;
+            if (example[0] == '-')
+            {
+                Cache[0] += example[0];
+                i++;
+            }
+            for (i=i; i < example.Length;i++)
             {              
-                if (example[i] == '/' || example[i] == '*' || example[i] == '+' || example[i] == '-')
+                if ((example[i] == '/' ||  example[i] == '*') && example[i+1] == '-')
                 {
                     index++;
                     Cache[index] += example[i];
                     index++;
+                    Cache[index] += example[i+1];
+                    i++;
                 }
                 else
-                {
-                    Cache[index] += example[i];
+                if (example[i] == '/' || example[i] == '*' || example[i] == '+' || example[i] == '-')
+                {                   
+                        index++;
+                        Cache[index] += example[i];
+                        index++;                  
                 }
+                else                
+                    Cache[index] += example[i];               
             }
          return Cache;
         }
