@@ -32,18 +32,27 @@ namespace Calc
                     if (example[i] == ')')
                     {
                         endIndex = i;
-                        for (int j = startIndex + 1; j < endIndex; j++)
+                        for (int j = startIndex+1; j < endIndex; j++)
                             exampleInBrackets += example[j];
-                        for (int j = 0; j < startIndex - 1; j++)
+                        for (int j = 0; j < startIndex-1; j++)
                             endString += example[j];
+                        if (Convert.ToSingle(StringToNumber(GetCountMathIterations(exampleInBrackets), exampleInBrackets)) < 0)
                         endString += StringToNumber(GetCountMathIterations(exampleInBrackets), exampleInBrackets);
-                        for (int j = endIndex + 1; j < example.Length; j++)
+                        else
+                        {
+                            endString += example[startIndex - 1];
+                            endString += StringToNumber(GetCountMathIterations(exampleInBrackets), exampleInBrackets);
+                        }    
+                        for (int j = endIndex+1; j < example.Length; j++)
                             endString += example[j];
                         break;
                     }
                 }              
                 example = endString; 
                 endString = string.Empty;
+                exampleInBrackets = string.Empty;
+                startIndex = 0;
+                endIndex = 0;
             }
             return example;
         }
@@ -122,8 +131,8 @@ namespace Calc
 
                 Example = string.Empty;
                 for (int i = 0; i < Cache.Length; i++)
-                    if (Cache[i] != null)
-                        Example = Example + Cache[i] + " ";
+                    if (Cache[i] != null || Cache[i] != " ")
+                        Example = Example + Cache[i];
             }
             return Example;
         }
@@ -133,7 +142,7 @@ namespace Calc
             string [] Cache = new string[example.Length];
             int index = 0;
          for (int i = 0; i < example.Length;i++)
-            {
+            {              
                 if (example[i] == '/' || example[i] == '*' || example[i] == '+' || example[i] == '-')
                 {
                     index++;
